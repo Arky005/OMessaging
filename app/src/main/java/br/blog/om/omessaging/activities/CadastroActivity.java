@@ -58,9 +58,9 @@ public class CadastroActivity extends AppCompatActivity {
 
         //mostrarMensagem("OK", "Deu certo");
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        usuario.setId(tm.getSimSerialNumber());
+        usuario.setId(editEmail.getText().toString());
         usuario.setNome(editNome.getText().toString());
-        usuariosReference.push().setValue(usuario);
+        usuariosReference.child(usuario.getId()).setValue(usuario);
 
         entrarEmSala("saladosmorais");
         entrarEmSala("salateste2");
