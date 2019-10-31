@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 //Usuario novo = dataSnapshot.getValue(Usuario.class);
                 //mostrarMensagem(novo.getNome(), novo.getId());
-               // usuario = dataSnapshot.getValue(Usuario.class);
-              //  mostrarMensagem(usuario.getSalas().get("salateste"), "");
+                usuario = dataSnapshot.getValue(Usuario.class);
+                mostrarMensagem(usuario.getSalas().get("saladosmorais"), "");
             }
 
             @Override
