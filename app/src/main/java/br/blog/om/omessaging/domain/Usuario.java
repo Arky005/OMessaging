@@ -1,9 +1,9 @@
 package br.blog.om.omessaging.domain;
 
 
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable;
-
 import java.util.HashMap;
+
+import br.blog.om.omessaging.activities.CadastroActivity;
 
 public class Usuario {
 
@@ -11,6 +11,13 @@ public class Usuario {
     HashMap<String, String> salas;
 
 
+
+    public String[] getArraySalas() {
+
+
+
+        return null;
+    }
 
     public HashMap<String, String> getSalas() {
         return salas;
@@ -34,5 +41,9 @@ public class Usuario {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public static Usuario getInstance(){
+        return CadastroActivity.getUsuarioAtual();
     }
 }

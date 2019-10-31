@@ -21,24 +21,22 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import br.blog.om.omessaging.R;
-import br.blog.om.omessaging.domain.Sala;
 import br.blog.om.omessaging.domain.Usuario;
 
+import static br.blog.om.omessaging.references.Referencias.salasReference;
+import static br.blog.om.omessaging.references.Referencias.usuariosReference;
 import static br.blog.om.omessaging.util.MensagensUsuario.PERMISSAO_NECESSARIA;
 import static br.blog.om.omessaging.util.MensagensUsuario.PERMISSAO_NECESSARIA_MSG;
 
-public class MainActivity extends AppCompatActivity {
+public class CadastroActivity extends AppCompatActivity {
 
     static Context context;
     static Button botao;
-    private Usuario usuario;
-    static EditText editNome;
-    private DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-    private DatabaseReference usuarios = reference.child("Usuarios");
-    private DatabaseReference salas = reference.child("Salas");
+    private static Usuario usuario;
+    static EditText editNome, editEmail, editSenha, editSenha2;
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -62,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         usuario.setId(tm.getSimSerialNumber());
         usuario.setNome(editNome.getText().toString());
-        usuarios.child(usuario.getId()).setValue(usuario);
+        usuariosReference.push().setValue(usuario);
 
         entrarEmSala("saladosmorais");
         entrarEmSala("salateste2");
@@ -73,18 +71,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void entrarEmSala(String nome){
-        salas.child(nome).child("nome").setValue(nome);
-        salas.child(nome).child("usuarios").child(usuario.getId()).setValue(usuario);
-        usuarios.child(usuario.getId()).child("salas").child(nome).setValue(nome);
+        salasReference.child(nome).child("nome").setValue(nome);
+        salasReference.child(nome).child("usuarios").child(usuario.getId()).setValue(usuario);
+        usuariosReference.child(usuario.getId()).child("salas").child(nome).setValue(nome);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        context = MainActivity.this;
+        setContentView(R.layout.activity_cadastro);
+        context = CadastroActivity.this;
         botao = findViewById(R.id.botaoCriarConta);
-        editNome = findViewById(R.id.editNome);
+        editNome = findViewById(R.id.editNomeCadastro);
+        editEmail = findViewById(R.id.editEmailCadastro);
+        editSenha = findViewById(R.id.editSenhaCadastro);
+        editSenha2 = findViewById(R.id.editSenhaCadastro2);
         usuario = new Usuario();
 
 
@@ -102,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
                     pedirAcessoAoChip(PERMISSAO_NECESSARIA, PERMISSAO_NECESSARIA_MSG);
                 } else if(editNome.getText().length()<3){
                     mostrarMensagem("Aviso", "O nome deve conter pelo menos 3 caracteres.");
+                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(editEmail.getText()).matches()){
+                    mostrarMensagem("Aviso", "O e-mail digitado não é válido.");
+                } else if (editSenha.getText().length()<5){
+                    mostrarMensagem("Aviso", "A senha deve ter pelo menos 5 caracteres.");
+                } else if (!editSenha2.getText().toString().equals(editSenha.getText().toString())){
+                    mostrarMensagem("Aviso", "As senhas digitadas não coincidem.");
                 } else {
                     criarConta();
                 }
@@ -109,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        usuarios.addChildEventListener(new ChildEventListener() {
+        usuariosReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
@@ -119,8 +127,9 @@ public class MainActivity extends AppCompatActivity {
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 //Usuario novo = dataSnapshot.getValue(Usuario.class);
                 //mostrarMensagem(novo.getNome(), novo.getId());
-                usuario = dataSnapshot.getValue(Usuario.class);
-                mostrarMensagem(usuario.getSalas().get("saladosmorais"), "");
+               // usuario = dataSnapshot.getValue(Usuario.class);
+               // Set<String> chaves = usuario.getSalas().keySet();
+               // mostrarMensagem(chaves.toArray()[0].toString(), "");
             }
 
             @Override
@@ -183,4 +192,6 @@ public class MainActivity extends AppCompatActivity {
     public static Context getContext() {
         return context;
     }
+
+    public static Usuario getUsuarioAtual(){ return usuario; }
 }
